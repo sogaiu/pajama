@@ -290,7 +290,7 @@
 
 (defn update-pkgs
   []
-  (pm/bundle-install (cnf/dyn:pkglist)) false true)
+  (pm/bundle-install (cnf/dyn:pkglist) false true))
 
 (defn quickbin
   [input output]
