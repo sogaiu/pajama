@@ -107,7 +107,7 @@
     Unprivileged project subcommands:
 
         build
-            Build all artifacts in the build/ directory, or the value 
+            Build all artifacts in the build/ directory, or the value
             specified in --buildpath.
 
         configure path

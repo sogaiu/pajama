@@ -44,7 +44,7 @@
 (defn- utd
   "Check if a target is up to date.
   Inputs are guaranteed to already be in the utd-cache."
-  [target all-targets utd-cache] 
+  [target all-targets utd-cache]
   (def rule (get all-targets target))
   (when (= target (get rule :task)) (break false))
   (def mtime (os/stat target :modified))

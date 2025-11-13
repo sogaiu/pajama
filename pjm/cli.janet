@@ -8,9 +8,9 @@
 
 (def- argpeg
   (peg/compile
-    '(choice (sequence "--" 
-                       (capture (some (if-not "=" 1))) 
-                       (choice (sequence "=" 
+    '(choice (sequence "--"
+                       (capture (some (if-not "=" 1)))
+                       (choice (sequence "="
                                          (capture (any 1)))
                                -1))
              (sequence (capture "-")
