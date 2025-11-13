@@ -12,7 +12,7 @@
 
 (defn help
   []
-  (print 
+  (print
     ```
     usage: pjm [--key=value, --flag] ... [subcommand] [args] ...
 
@@ -108,7 +108,7 @@
             Build all artifacts in the build/ directory, or the value specified in --buildpath.
 
         configure path
-            Create a directory for out-of-tree builds, and also set project options. 
+            Create a directory for out-of-tree builds, and also set project options.
 
         clean
             Remove any generated files or artifacts.
@@ -174,7 +174,8 @@
   []
   (def configs (sorted (keys cnf/config-set)))
   (each conf configs
-    (printf (if (dyn :nocolor) ":%-26s%.99q" ":%-26s%.99Q") (string conf) (dyn conf))))
+    (printf (if (dyn :nocolor) ":%-26s%.99q" ":%-26s%.99Q")
+            (string conf) (dyn conf))))
 
 (defn show-paths
   []

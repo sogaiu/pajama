@@ -1,6 +1,6 @@
 ###
 ### cgen.janet
-### 
+###
 ###
 ### A DSL that compiles to C. Let's
 ### you use Janet's macro system to
@@ -355,7 +355,7 @@
           (prin " else ")
           (emit-block condition))
         (do
-          (if is-first 
+          (if is-first
             (do (emit-indent) (prin "if ("))
             (prin " else if ("))
           (set is-first false)
@@ -421,7 +421,7 @@
   (defn emit-directive
     [& args]
     (print "#" (string/join (map string args) " ")))
- 
+
   (setfn emit-top
          [form]
          (case (get form 0)
