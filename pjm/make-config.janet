@@ -5,8 +5,11 @@
 (import ./shutil)
 
 (defn generate-config
-  "Make a pretty good configuration file for the current target. Returns a buffer with config source contents.
-  If `destdir` is given, will generate the folders needed to create a pjm tree."
+  ``
+  Make a pretty good configuration file for the current target.
+  Returns a buffer with config source contents. If `destdir` is
+  given, will generate the folders needed to create a pjm tree.
+  ``
   [&opt destdir silent as-data]
 
   (def hostos (os/which))

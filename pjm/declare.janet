@@ -19,7 +19,10 @@
     (dofile in-path :env env)))
 
 (defn install-rule
-  "Add install and uninstall rule for moving files from src into destdir."
+  ``
+  Add install and uninstall rule for moving files from `src` into
+  `destdir`.
+  ``
   [src destdir]
   (unless (check-release) (break))
   (def name (last (peg/match sh/path-splitter src)))
@@ -31,7 +34,10 @@
           (sh/copy src dir)))
 
 (defn install-file-rule
-  "Add install and uninstall rule for moving file from src into destdir."
+  ``
+  Add install and uninstall rule for moving file from `src` into
+  `dest`.
+  ``
   [src dest]
   (unless (check-release) (break))
   (array/push (dyn :installed-files) dest)
@@ -40,7 +46,7 @@
           (sh/copyfile src dest1)))
 
 (defn uninstall
-  "Uninstall bundle named name"
+  "Uninstall bundle named `name`."
   [name]
   (def manifest (sh/find-manifest name))
   (when-with [f (file/open manifest)]
@@ -55,9 +61,11 @@
     (print "Uninstalled.")))
 
 (defn declare-native
-  "Declare a native module. This is a shared library that can be loaded
+  ``
+  Declare a native module. This is a shared library that can be loaded
   dynamically by a janet runtime. This also builds a static libary that
-  can be used to bundle janet code and native into a single executable."
+  can be used to bundle janet code and native into a single executable.
+  ``
   [&keys opts]
   (def sources (opts :source))
   (def name (opts :name))
@@ -175,11 +183,13 @@
   declare-targets)
 
 (defn declare-source
-  "Create Janet modules. This does not actually build the module(s),
-  but registers them for packaging and installation. :source should be an
-  array of files and directores to copy into JANET_MODPATH or JANET_PATH.
-  :prefix can optionally be given to modify the destination path to be
-  (string JANET_PATH prefix source)."
+  ``
+  Create Janet modules. This does not actually build the module(s),
+  but registers them for packaging and installation. `:source` should
+  be an array of files and directories to copy into `JANET_MODPATH` or
+  `JANET_PATH`. `:prefix` can optionally be given to modify the
+  destination path to be `(string JANET_PATH prefix source)`.
+  ``
   [&keys {:source sources :prefix prefix}]
   (def path (string (cnf/dyn:modpath) (if prefix "/") prefix))
   (if (bytes? sources)
@@ -190,8 +200,10 @@
     (array/push (dyn :installed-files) path)))
 
 (defn declare-headers
-  "Declare headers for a library installation. Installed headers can be used by other native
-  libraries."
+  ``
+  Declare headers for a library installation. Installed headers can be
+  used by other native libraries.
+  ``
   [&keys {:headers headers :prefix prefix}]
   (def path (string (cnf/dyn:modpath) "/" (or prefix "")))
   (if (bytes? headers)
@@ -205,10 +217,14 @@
   (install-rule main (cnf/dyn:binpath)))
 
 (defn declare-executable
-  "Declare a janet file to be the entry of a standalone executable program. The entry
-  file is evaluated and a main function is looked for in the entry file. This function
-  is marshalled into bytecode which is then embedded in a final executable for distribution.\n\n
-  This executable can be installed as well to the --binpath given."
+  ``
+  Declare a janet file to be the entry of a standalone executable program.
+  The entry file is evaluated and a main function is looked for in the
+  entry file. This function is marshalled into bytecode which is then
+  embedded in a final executable for distribution.
+
+  This executable can be installed as well to the --binpath given.
+  ``
   [&keys {:install install :name name :entry entry :headers headers
           :cflags cflags :lflags lflags :deps deps :ldflags ldflags
           :no-compile no-compile :no-core no-core}]
@@ -228,10 +244,12 @@
         (install-rule dest (cnf/dyn:binpath))))))
 
 (defn declare-binscript
-  ``Declare a janet file to be installed as an executable script. Creates
-  a shim on windows. If hardcode is true, will insert code into the script
-  such that it will run correctly even when JANET_PATH is changed. if auto-shebang
-  is truthy, will also automatically insert a correct shebang line.
+  ``
+  Declare a janet file to be installed as an executable script. Creates
+  a shim on windows. If `:hardcode-syspath` is true, will insert code
+  into the script such that it will run correctly even when `JANET_PATH`
+  is changed. If `:is-janet` is truthy, will also automatically
+  insert a correct shebang line.
   ``
   [&keys {:main main :hardcode-syspath hardcode :is-janet is-janet}]
   (def binpath (cnf/dyn:binpath))
@@ -255,22 +273,27 @@
               (sh/create-dirs destpath)
               (print "installing " main " to " destpath)
               (spit destpath contents)
-              (unless (sh/is-win-or-mingw) (sh/shell "chmod" "+x" destpath))))
+              (unless (sh/is-win-or-mingw)
+                (sh/shell "chmod" "+x" destpath))))
     (install-rule main binpath))
   # Create a dud batch file when on windows.
   (when (sh/is-win-or-mingw)
     (def name (last (peg/match sh/path-splitter main)))
     (def fullname (string binpath "/" name))
-    (def bat (string "@echo off\r\ngoto #_undefined_# 2>NUL || title %COMSPEC% & janet \"" fullname "\" %*"))
+    (def bat (string "@echo off\r\n"
+                     "goto #_undefined_# 2>NUL || "
+                     "title %COMSPEC% & janet \"" fullname "\" %*"))
     (def newname (string binpath "/" name ".bat"))
     (array/push (dyn :installed-files) newname)
     (r/task "install" []
             (spit (string (dyn :dest-dir "") newname) bat))))
 
 (defn declare-archive
-  "Build a janet archive. This is a file that bundles together many janet
-  scripts into a janet image. This file can the be moved to any machine with
-  a janet vm and the required dependencies and run there."
+  ``
+  Build a janet archive. This is a file that bundles together many janet
+  scripts into a janet image. This file can then be moved to any machine
+  with a janet vm and the required dependencies and run there.
+  ``
   [&keys opts]
   (def entry (opts :entry))
   (def name (opts :name))
@@ -289,8 +312,10 @@
     (install-rule page mp)))
 
 (defn run-tests
-  "Run tests on a project in the current directory. The tests will
-  be run in the environment dictated by (dyn :modpath)."
+  ``
+  Run tests on a project in the current directory. The tests will
+  be run in the environment dictated by `(dyn :modpath)`.
+  ``
   [&opt root-directory]
   (var errors-found 0)
   (defn dodir
@@ -317,9 +342,11 @@
   (flush))
 
 (defn declare-project
-  "Define your project metadata. This should
-  be the first declaration in a project.janet file.
-  Also sets up basic task targets like clean, build, test, etc."
+  ``
+  Define your project metadata. This should be the first declaration
+  in a project.janet file. Also sets up basic task targets like clean,
+  build, test, etc.
+  ``
   [&keys meta]
   (setdyn :project (struct/to-table meta))
 

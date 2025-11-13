@@ -32,7 +32,7 @@
         :error))))
 
 (defn- target-not-found
-  "Creates an error message."
+  "Error when a target doesn't exist and no rule exists to build."
   [target]
   (errorf "target %v does not exist and no rule exists to build it" target))
 
@@ -130,7 +130,7 @@
   (target-append target :inputs input))
 
 (defn add-dep
-  "Alias for `add-input`"
+  "Alias for `add-input`."
   [target dep]
   (target-append target :inputs dep))
 

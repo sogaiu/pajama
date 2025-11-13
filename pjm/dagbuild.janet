@@ -10,9 +10,11 @@
 #
 
 (defn pmap
-  "Function form of `ev/gather`. If any of the
-  sibling fibers error, all other siblings will be canceled.
-  Returns the gathered results in an array."
+  ``
+  Function form of `ev/gather`. If any of the sibling fibers
+  error, all other siblings will be canceled. Returns the
+  gathered results in an array.
+  ``
   [f data]
   (def chan (ev/chan))
   (def res @[])
@@ -27,12 +29,14 @@
   res)
 
 (defn pdag
-  "Executes a dag by calling f on every node in the graph.
-  Can set the number of workers
-  for parallel execution. The graph is represented as a table
-  mapping nodes to arrays of child nodes. Each node will only be evaluated
-  after all children have been evaluated. Returns a table mapping each node
-  to the result of `(f node)`."
+  ``
+  Executes `dag` by calling `f` on every node in the graph.
+  Can set the number of workers for parallel execution. The graph
+  is represented as a table mapping nodes to arrays of child nodes.
+  Each node will only be evaluated after all children have been
+  evaluated. Returns a table mapping each node to the result of
+  `(f node)`.
+  ``
   [f dag &opt n-workers]
 
   # preprocess

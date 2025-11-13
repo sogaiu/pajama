@@ -52,8 +52,10 @@
   env)
 
 (defn require-pjm
-  "Require a pjm file project file. This is different from a normal require
-  in that code is loaded in the pjm environment."
+  ``
+  Require a pjm file project file. This is different from a normal
+  require in that code is loaded in the pjm environment.
+  ``
   [path &opt base-env]
   (unless (os/stat path :mode)
     (error (string "cannot open " path)))
@@ -62,9 +64,11 @@
   env)
 
 (defn load-project-meta
-  "Load the metadata from a project.janet file without doing a full evaluation
-  of the project.janet file. Returns a struct with the project metadata. Raises
-  an error if no metadata found."
+  ``
+  Load the metadata from a project.janet file without doing a full
+  evaluation of the project.janet file. Returns a struct with the
+  project metadata. Raises an error if no metadata found.
+  ``
   [&opt path]
   (default path "./project.janet")
   (def src (slurp path))
@@ -82,8 +86,10 @@
   ret)
 
 (defn import-rules
-  "Import another file that defines more rules. This ruleset
-  is merged into the current ruleset."
+  ``
+  Import another file that defines more rules. This ruleset is
+  merged into the current ruleset.
+  ``
   [path &opt base-env]
   (def env (require-pjm path base-env))
   (when-let [rules (get env :rules)] (merge-into (r/getrules) rules))
@@ -109,7 +115,7 @@
 (var- bundle-install-recursive nil)
 
 (defn- resolve-bundle-name
-  "Convert short bundle names to full tables."
+  "Convert short bundle names to full dictionaries."
   [bname]
   (if-not (string/find ":" bname)
     (let [pkgs (try
@@ -124,7 +130,7 @@
     bname))
 
 (defn resolve-bundle
-  "Convert any bundle string/table to the normalized table form."
+  "Convert any bundle string/table to the normalized dictionary form."
   [bundle]
   (var repo nil)
   (var tag nil)
@@ -188,7 +194,7 @@
   (git "-C" bundle-dir "reset" "--hard" "FETCH_HEAD"))
 
 (defn download-git-bundle
-  "Download a git bundle from a remote respository"
+  "Download a git bundle from a remote respository."
   [bundle-dir url tag shallow]
   (var fresh false)
   (if (dyn :offline)
@@ -206,8 +212,11 @@
     (git "-C" bundle-dir "submodule" "update" "--init" "--recursive")))
 
 (defn download-tar-bundle
-  "Download a dependency from a tape archive. The archive should have exactly one
-  top level directory that contains the contents of the project."
+  ``
+  Download a dependency from a tape archive. The archive should
+  have exactly one top level directory containing the contents of
+  the project.
+  ``
   [bundle-dir url &opt force-gz]
   (def has-gz (string/has-suffix? "gz" url))
   (def is-remote (string/find ":" url))
@@ -220,8 +229,10 @@
   (tar tar-flags dest-archive "--strip-components=1" "-C" bundle-dir))
 
 (defn download-bundle
-  "Download the package source (using git) to the local cache. Return the
-  path to the downloaded or cached soure code."
+  ``
+  Download the package source (using git) to the local cache.
+  Return the path to the downloaded or cached soure code.
+  ``
   [url bundle-type &opt tag shallow]
   (def cache (sh/find-cache))
   (os/mkdir cache)

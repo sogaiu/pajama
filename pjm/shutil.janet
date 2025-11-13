@@ -9,25 +9,27 @@
    :red "\e[31m"})
 
 (defn color
-  "Color text with ascii escape sequences if (os/isatty)"
+  "Color text with ascii escape sequences if `(os/isatty)`."
   [input-color text]
   (if (os/isatty)
     (string (get colors input-color "\e[0m") text "\e[0m")
     text))
 
 (defn is-win
-  "Check if we should assume a DOS-like shell or default
-  to posix shell."
+  ``
+  Check if we should assume a DOS-like shell or default to
+  posix shell.
+  ``
   []
   (dyn :use-batch-shell))
 
 (defn is-mingw
-  "Check if built with mingw"
+  "Check if built with mingw."
   []
   (= (os/which) :mingw))
 
 (defn is-win-or-mingw
-  "Check if built with mingw"
+  "Check if built with windows or mingw."
   []
   (def os (os/which))
   (or (= os :mingw) (= os :windows)))
@@ -41,8 +43,10 @@
       (string x "/"))))
 
 (defn find-manifest-dir
-  "Get the path to the directory containing manifests for installed
-  packages."
+  ``
+  Get the path to the directory containing manifests for installed
+  packages.
+  ``
   []
   (string (dyn :dest-dir "") (cnf/dyn:modpath) "/.manifests"))
 
@@ -70,7 +74,7 @@
     (os/rm path)))
 
 (defn rimraf
-  "Hard delete directory tree"
+  "Hard delete directory tree."
   [path]
   (if (is-win-or-mingw)
     # windows get rid of read-only files
@@ -124,7 +128,7 @@
   (os/open (if (is-win-or-mingw) "NUL" "/dev/null") :rw))
 
 (defn- patch-path
-  "Add the bin-path to the regular path"
+  "Add the bin-path to the regular path."
   [path]
   (if-let [bp (cnf/dyn:binpath)]
     (string bp (if (is-win-or-mingw) ";" ":") path)
@@ -139,7 +143,7 @@
                                 PATH (patch-path (os/getenv PATH))})))
 
 (defn shell
-  "Do a shell command"
+  "Do a shell command."
   [& args]
   # First argument is executable and must not contain spaces, workaround
   # for binaries which have spaces such as `zig cc`.
@@ -173,7 +177,10 @@
   (string/trimr buf))
 
 (defn drop1-shell
-  "Variant of `shell` to play nice with cl.exe, which outputs some junk to terminal that can't be turned off."
+  ``
+  Variant of `shell` to play nice with cl.exe, which outputs some
+  junk to terminal that can't be turned off.
+  ``
   [std args]
   (if (dyn :silent) (break (shell ;args)))
   (when (dyn :verbose)
@@ -214,7 +221,7 @@
     (shell "cp" "-rf" src dest)))
 
 (defn copyfile
-  "Copy a file one location to another."
+  "Copy a file from one location to another."
   [src dest]
   (print "copying file " src " to " dest "...")
   (->> src slurp (spit dest)))
@@ -266,7 +273,10 @@
 (defn- check-is-dep [x] (unless (or (string/has-prefix? "/" x) (string/has-prefix? "." x)) x))
 
 (defn do-monkeypatch
-  "Modify the existing environment to have the same paths as the test environment."
+  ``
+  Modify the existing environment to have the same paths as the test
+  environment.
+  ``
   [build-dir]
   (def old-builddir (dyn :build-dir))
   (put root-env :build-dir build-dir)
@@ -288,7 +298,10 @@
     (string build-dir ":all:" (cnf/dyn:modext))))
 
 (defn run-patched
-  "Run a subprocess Janet repl that has the same environment as the test environment."
+  ``
+  Run a subprocess Janet repl that has the same environment as the test
+  environment.
+  ``
   [& extra-args]
   (def bd (find-build-dir))
   (def monkey-patch (make-monkeypatch bd))
@@ -299,7 +312,7 @@
     environ))
 
 (defn run-repl
-  "Run a repl in the monkey patched test environment"
+  "Run a repl in the monkey patched test environment."
   []
   (run-patched "-r"))
 

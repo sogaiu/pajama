@@ -317,9 +317,12 @@
   (repl getchunk nil env))
 
 (defn set-tree
-  "Set the module tree for installing dependencies. This just sets the modpath
-  binpath and manpath. Also creates the tree if it doesn't exist. However, still
-  uses the system libraries and headers for janet."
+  ``
+  Set the module tree for installing dependencies. This just sets
+  the modpath, binpath, and manpath. Also creates the tree if it
+  doesn't exist. However, still uses the system libraries and
+  headers for janet.
+  ``
   [tree]
   (def abs-tree (sh/abspath tree))
   (def sep (if (sh/is-win) "\\" "/"))
@@ -335,7 +338,10 @@
   (setdyn :modpath tree-lib))
 
 (defn enable-local-mode
-  "Modify the config to enable local development. Creates a local tree if one does not exist in ./pjm_tree/"
+  ``
+  Modify the config to enable local development. Creates a local tree
+  if one does not exist in `./pjm_tree/`.
+  ``
   []
   (set-tree "pjm_tree"))
 
@@ -350,17 +356,17 @@
   (pm/out-of-tree-config path opts))
 
 (defn new-project
-  "Create a new project"
+  "Create a new project."
   [name]
   (scf/scaffold-project name {:c false}))
 
 (defn new-c-project
-  "Create a new C project"
+  "Create a new C project."
   [name]
   (scf/scaffold-project name {:c true}))
 
 (defn new-exe-project
-  "Create a new executable project"
+  "Create a new executable project."
   [name]
   (scf/scaffold-project name {:c false :exe true}))
 

@@ -7,7 +7,7 @@
 (import ./shutil :as sh)
 
 (def- entry-replacer
-  "Convert url with potential bad characters into an entry-name"
+  "Convert url with potential bad characters into an entry-name."
   (peg/compile
     ~(accumulate (any (choice (capture (range "AZ" "az" "09" "__"))
                               (replace (capture 1)
@@ -26,7 +26,7 @@
   )
 
 (defn entry-replace
-  "Escape special characters in the entry-name"
+  "Escape special characters in the entry-name."
   [name]
   (get (peg/match entry-replacer name) 0))
 
