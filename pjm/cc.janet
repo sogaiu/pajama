@@ -8,7 +8,22 @@
 
 (def- entry-replacer
   "Convert url with potential bad characters into an entry-name"
-  (peg/compile ~(% (any (+ '(range "AZ" "az" "09" "__") (/ '1 ,|(string "_" ($ 0) "_")))))))
+  (peg/compile
+    ~(accumulate (any (choice (capture (range "AZ" "az" "09" "__"))
+                              (replace (capture 1)
+                                       ,|(string "_" (get $ 0) "_")))))))
+
+(comment
+
+  (peg/match entry-replacer "https://localhost")
+  # =>
+  @["https_58__47__47_localhost"]
+
+  (peg/match entry-replacer "https://github.com/janet-lang/janet")
+  # =>
+  @["https_58__47__47_github_46_com_47_janet_45_lang_47_janet"]
+
+  )
 
 (defn entry-replace
   "Escape special characters in the entry-name"
@@ -22,6 +37,22 @@
        (string/replace-all "\\" "___")
        (string/replace-all "/" "___")
        (string/replace-all ".janet" "")))
+
+(comment
+
+  (embed-name "/usr/local/src")
+  # =>
+  "___usr___local___src"
+
+  (embed-name `C:\WINDOWS\SYSTEM32`)
+  # =>
+  "C:___WINDOWS___SYSTEM32"
+
+  (embed-name "janet/src/boot/boot.janet")
+  # =>
+  "janet___src___boot___boot"
+
+  )
 
 (defn out-path
   "Take a source file path and convert it to an output path."

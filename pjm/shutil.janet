@@ -94,7 +94,21 @@
 
 (def path-splitter
   "split paths on / and \\."
-  (peg/compile ~(any (* '(any (if-not (set `\/`) 1)) (+ (set `\/`) -1)))))
+  (peg/compile
+    ~(any (sequence (capture (any (if-not (set `\/`) 1)))
+                    (choice (set `\/`) -1)))))
+
+(comment
+
+  (peg/match path-splitter "/usr/local/lib/janet/.manifests")
+  # =>
+  @["" "usr" "local" "lib" "janet" ".manifests"]
+
+  (peg/match path-splitter `C:\WINDOWS\SYSTEM32`)
+  # =>
+  @["C:" "WINDOWS" "SYSTEM32"]
+
+  )
 
 (defn create-dirs
   "Create all directories needed for a file (mkdir -p)."
@@ -210,14 +224,28 @@
   generating entries in install manifest file)."
   [path]
   (if (if (is-win-or-mingw)
-        (peg/match '(+ "\\" (* (range "AZ" "az") (+ ":/" ":\\"))) path)
+        (peg/match '(choice `\`
+                            (sequence (range "AZ" "az")
+                                      (choice ":/" `:\`)))
+                   path)
         (string/has-prefix? "/" path))
     path
     (string (os/cwd) "/" path)))
 
 (def- filepath-replacer
   "Convert url with potential bad characters into a file path element."
-  (peg/compile ~(% (any (+ (/ '(set "<>:\"/\\|?*") "_") '1)))))
+  (peg/compile
+    ~(accumulate
+       (any (choice (replace (capture (set "<>:\"/\\|?*")) "_")
+                    (capture 1))))))
+
+(comment
+
+  (peg/match filepath-replacer "https://github.com/janet-lang/janet")
+  # =>
+  @["https___github.com_janet-lang_janet"]
+
+  )
 
 (defn filepath-replace
   "Remove special characters from a string or path

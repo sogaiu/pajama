@@ -19,8 +19,29 @@
 (def- mangle-peg
   (peg/compile
     ~{:valid (range "az" "AZ" "__")
-      :one (+ (/ "-" "_") ':valid (/ '1 ,|(string "_X" ($ 0))))
-      :main (% (* :one (any (+ ':d :one))))}))
+      :one (choice (replace "-" "_")
+                   (capture :valid)
+                   (replace (capture 1)
+                            ,|(string "_X" (get $ 0))))
+      :main (accumulate (sequence :one
+                                  (any (choice (capture :d)
+                                               :one))))}))
+
+(comment
+
+  (peg/match mangle-peg "make-config")
+  # =>
+  @["make_config"]
+
+  (peg/match mangle-peg "a1")
+  # =>
+  @["a1"]
+
+  (peg/match mangle-peg "1")
+  # =>
+  @["_X49"]
+
+  )
 
 (defn mangle
   "Convert any sequence of bytes to a valid C identifier in a way that is unlikely to collide.
