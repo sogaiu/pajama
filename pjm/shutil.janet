@@ -97,7 +97,9 @@
   (rimraf manifest))
 
 (def path-splitter
-  "split paths on / and \\."
+  ``
+  Split paths on / and \.
+  ``
   (peg/compile
     ~(any (sequence (capture (any (if-not (set `\/`) 1)))
                     (choice (set `\/`) -1)))))
