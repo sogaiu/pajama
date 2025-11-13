@@ -113,10 +113,10 @@
   (if (empty? cmdbuf)
     (commands/help)
     (if-let [com (get commands/subcommands (first cmdbuf))]
-        (com ;(slice cmdbuf 1))
-        (do
-          (print "invalid command " (first cmdbuf))
-          (commands/help)))))
+      (com ;(slice cmdbuf 1))
+      (do
+        (print "invalid command " (first cmdbuf))
+        (commands/help)))))
 
 (defmacro pjm
   "A Macro User Interface for pjm to be used from a repl in a way similar to the command line."

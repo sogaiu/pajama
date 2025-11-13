@@ -62,9 +62,9 @@
   [path]
   (case (os/lstat path :mode)
     :directory (do
-      (each subpath (os/dir path)
-        (rm (string path "/" subpath)))
-      (os/rmdir path))
+                 (each subpath (os/dir path)
+                   (rm (string path "/" subpath)))
+                 (os/rmdir path))
     nil nil # do nothing if file does not exist
     # Default, try to remove
     (os/rm path)))

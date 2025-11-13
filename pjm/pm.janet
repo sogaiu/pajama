@@ -348,7 +348,7 @@
         (bundle-install new-bundle true true)
         (++ updated-count))
       ([err f]
-       (debug/stacktrace f err (string "unable to update dependency " p ": ")))))
+        (debug/stacktrace f err (string "unable to update dependency " p ": ")))))
   (print "updated " updated-count " of " (length to-update) " installed packages")
   (unless (= updated-count (length to-update))
     (error "could not update all installed packages")))
@@ -367,14 +367,14 @@
   (print "creating out of tree build at " (sh/abspath path))
   (sh/create-dirs dest)
   (spit odest
-    (string/join
-      (map |(string/format "(setdyn %v %j)" ($ 0) ($ 1))
-           (sorted (pairs options)))
-      "\n"))
+        (string/join
+          (map |(string/format "(setdyn %v %j)" ($ 0) ($ 1))
+               (sorted (pairs options)))
+          "\n"))
   (spit dest
-    (string/format
-      ```
-      (os/cd %v)
-      (import-rules "./project.janet")
-      ```
-      current)))
+        (string/format
+          ```
+          (os/cd %v)
+          (import-rules "./project.janet")
+          ```
+          current)))

@@ -23,13 +23,13 @@
       # On errors, ensure that none of the output file for this rule
       # are kept.
       ([err fib]
-       (unless no-print-errors
-         (if (dyn :verbose)
-           (debug/stacktrace fib err "error: ")
-           (eprint "error: " err)))
-       (each o (get rule :outputs [])
-         (protect (shutil/rm o)))
-       :error))))
+        (unless no-print-errors
+          (if (dyn :verbose)
+            (debug/stacktrace fib err "error: ")
+            (eprint "error: " err)))
+        (each o (get rule :outputs [])
+          (protect (shutil/rm o)))
+        :error))))
 
 (defn- target-not-found
   "Creates an error message."
