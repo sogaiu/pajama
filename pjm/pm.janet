@@ -77,7 +77,7 @@
   (parser/eof p)
   (var ret nil)
   (while (parser/has-more p)
-    (if ret (break))
+    (when ret (break))
     (def item (parser/produce p))
     (match item
       ['declare-project & rest] (set ret (struct ;rest))))
@@ -291,7 +291,7 @@
         (def dep-env (require-pjm "./project.janet" @{:pjm-no-deps true}))
         (unless no-deps
           (def meta (dep-env  :project))
-          (if-let [deps (meta :dependencies)]
+          (when-let [deps (meta :dependencies)]
             (each dep deps
               (bundle-install dep))))
         (each r ["build" "install"]

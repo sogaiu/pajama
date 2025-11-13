@@ -74,14 +74,14 @@
     [which name args defname]
     (assert (even? (length args)) "expected even number of arguments")
     (prin which " ")
-    (if name (prin name " "))
+    (when name (prin name " "))
     (emit-block-start)
     (each [field ftype] (partition 2 args)
       (emit-indent)
       (emit-type ftype field)
       (print ";"))
     (emit-block-end)
-    (if defname (prin " " defname)))
+    (when defname (prin " " defname)))
 
   (defn emit-struct-def
     [name args defname]
@@ -94,7 +94,7 @@
   (defn emit-enum-def
     [name args defname]
     (prin "enum ")
-    (if name (prin name " "))
+    (when name (prin name " "))
     (emit-block-start)
     (each x args
       (emit-indent)
@@ -105,7 +105,7 @@
           (print ","))
         (print x ",")))
     (emit-block-end)
-    (if defname (prin " " defname)))
+    (when defname (prin " " defname)))
 
   (defn emit-fn-pointer-type
     [ret-type args defname]
@@ -125,30 +125,30 @@
     [x alias]
     (emit-type x)
     (prin " *")
-    (if alias (prin alias)))
+    (when alias (prin alias)))
 
   (defn emit-ptr-ptr-type
     [x alias]
     (emit-type x)
     (prin " **")
-    (if alias (prin alias)))
+    (when alias (prin alias)))
 
   (defn emit-const-type
     [x alias]
     (prin "const ")
     (emit-type x)
-    (if alias (prin " " alias)))
+    (when alias (prin " " alias)))
 
   (defn emit-array-type
     [x n alias]
-    (if-not alias (prin "("))
+    (unless alias (prin "("))
     (emit-type x)
-    (if alias (prin " " alias))
+    (when alias (prin " " alias))
     (prin "[")
     (when n
       (emit-expression n true))
     (prin "]")
-    (if-not alias (prin ")")))
+    (unless alias (prin ")")))
 
   (setfn emit-type
          [definition &opt alias]
@@ -169,8 +169,8 @@
              'array (emit-array-type (definition 1) (get definition 2) alias)
              'const (emit-const-type (definition 1) alias)
              (errorf "unexpected type form %v" definition))
-           :keyword (do (prin definition) (if alias (prin " " alias)))
-           :symbol (do (prin definition) (if alias (prin " " alias)))
+           :keyword (do (prin definition) (when alias (prin " " alias)))
+           :symbol (do (prin definition) (when alias (prin " " alias)))
            (errorf "unexpected type form %v" definition)))
 
   (defn emit-typedef
@@ -187,7 +187,7 @@
     (emit-expression f (symbol? f))
     (prin "(")
     (for i 1 (length items)
-      (if (not= i 1) (prin ", "))
+      (when (not= i 1) (prin ", "))
       (emit-expression (in items i) true))
     (prin ")"))
 
@@ -195,7 +195,7 @@
     [op & xs]
     (var is-first true)
     (each x xs
-      (if-not is-first (prin " " op " "))
+      (unless is-first (prin " " op " "))
       (set is-first false)
       (emit-expression x)))
 
@@ -253,7 +253,7 @@
     (var is-first true)
     (prin "{")
     (each x args
-      (if-not is-first (prin ", "))
+      (unless is-first (prin ", "))
       (set is-first false)
       (emit-expression x true))
     (prin "}"))

@@ -46,7 +46,7 @@
                                                           (string win-prefix "/C")
                                                           (string prefix "/lib")))))
   (def fix-modpath (dyn :fix-modpath (os/getenv "JANET_STRICT_MODPATH")))
-  (def modpath (dyn :modpath (os/getenv "JANET_MODPATH" (if fix-modpath
+  (def modpath (dyn :modpath (os/getenv "JANET_MODPATH" (when fix-modpath
                                                           (if win-prefix
                                                             (string win-prefix "/Library")
                                                             (string prefix "/lib/janet"))))))

@@ -182,7 +182,7 @@
   junk to terminal that can't be turned off.
   ``
   [std args]
-  (if (dyn :silent) (break (shell ;args)))
+  (when (dyn :silent) (break (shell ;args)))
   (when (dyn :verbose)
     (flush)
     (print ;(interpose " " args)))

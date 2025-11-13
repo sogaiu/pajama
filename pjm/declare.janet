@@ -191,7 +191,7 @@
   destination path to be `(string JANET_PATH prefix source)`.
   ``
   [&keys {:source sources :prefix prefix}]
-  (def path (string (cnf/dyn:modpath) (if prefix "/") prefix))
+  (def path (string (cnf/dyn:modpath) (when prefix "/") prefix))
   (if (bytes? sources)
     (install-rule sources path)
     (each s sources
@@ -266,9 +266,9 @@
                   (def first-line (:read f :line))
                   (def second-line (string/format "(put root-env :syspath %v)\n" syspath))
                   (def rest (:read f :all))
-                  (string (if auto-shebang
+                  (string (when auto-shebang
                             (string "#!" (cnf/dyn:binpath) "/janet\n"))
-                          first-line (if hardcode second-line) rest)))
+                          first-line (when hardcode second-line) rest)))
               (def destpath (string (dyn :dest-dir "") path))
               (sh/create-dirs destpath)
               (print "installing " main " to " destpath)
@@ -381,14 +381,14 @@
             (case bundle-type
               :git
               (do
-                (if-let [shallow (dyn :shallow)]
+                (when-let [shallow (dyn :shallow)]
                   (put man :shallow shallow))
                 (protect
-                  (if-let [x (sh/exec-slurp (cnf/dyn:gitpath) "remote" "get-url" "origin")]
-                    (put man :url (if-not (empty? x) x))))
+                  (when-let [x (sh/exec-slurp (cnf/dyn:gitpath) "remote" "get-url" "origin")]
+                    (put man :url (unless (empty? x) x))))
                 (protect
-                  (if-let [x (sh/exec-slurp (cnf/dyn:gitpath) "rev-parse" "HEAD")]
-                    (put man :tag (if-not (empty? x) x)))))
+                  (when-let [x (sh/exec-slurp (cnf/dyn:gitpath) "rev-parse" "HEAD")]
+                    (put man :tag (unless (empty? x) x)))))
               :tar
               (do
                 (put man :url (slurp ".bundle-tar-url")))

@@ -79,7 +79,7 @@
                   (setdyn key v))
                 (setdyn key true)))))
         (do
-          (if (index-of a ["janet" "exec"]) (set flags-done true))
+          (when (index-of a ["janet" "exec"]) (set flags-done true))
           (array/push cmdbuf a)))))
 
   # Load the configuration file, or use default config.
@@ -101,7 +101,7 @@
   (put root-env :syspath (dyn :modpath))
 
   # Update packages if -u flag given
-  (if (dyn :update-pkgs)
+  (when (dyn :update-pkgs)
     (commands/update-pkgs))
 
   cmdbuf)

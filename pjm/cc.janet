@@ -86,7 +86,7 @@
   "Generate many defines. Takes a dictionary of defines. If a value is
   true, generates -DNAME (/DNAME on windows), otherwise -DNAME=value."
   [defines]
-  (def ret (seq [[d v] :pairs defines] (make-define d (if (not= v true) v))))
+  (def ret (seq [[d v] :pairs defines] (make-define d (when (not= v true) v))))
   (array/push ret (make-define "JANET_BUILD_TYPE" (cnf/dyn:build-type "release")))
   ret)
 
@@ -355,7 +355,7 @@ int main(int argc, const char **argv) {
               (if no-core
                 (let [temp @{}]
                   (eachp [k v] mdict1
-                    (if (or (cfunction? k) (abstract? k))
+                    (when (or (cfunction? k) (abstract? k))
                       (put temp k v)))
                   temp)
                 mdict1))
@@ -383,7 +383,7 @@ int main(int argc, const char **argv) {
             (def lookup-into-invocations @"")
             (loop [[prefix name] :pairs prefixes]
               (def meta (eval-string (slurp (modpath-to-meta name))))
-              (if (meta :cpp) (set has-cpp true))
+              (when (meta :cpp) (set has-cpp true))
               (buffer/push-string lookup-into-invocations
                                   "    temptab = janet_table(0);\n"
                                   "    temptab->proto = env;\n"

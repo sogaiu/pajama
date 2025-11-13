@@ -294,7 +294,7 @@
 
 (defn quickbin
   [input output]
-  (if (= (os/stat output :mode) :file)
+  (when (= (os/stat output :mode) :file)
     (print "output " output " exists."))
   (cc/create-executable @{:no-compile (dyn :no-compile)} input output (dyn :no-core))
   (pm/do-rule output))
@@ -309,12 +309,12 @@
           (put (pm/make-pjm-env) :project {})
           (propagate err f)))))
   (setdyn :pretty-format (if-not (dyn :nocolor) "%.20Q" "%.20q"))
-  (setdyn :err-color (if-not (dyn :nocolor) true))
+  (setdyn :err-color (unless (dyn :nocolor) true))
   (def p (env :project))
   (def name (p :name))
-  (if name (print "Project:     " name))
-  (if-let [r (p :repo)] (print "Repository:  " r))
-  (if-let [a (p :author)] (print "Author:      " a))
+  (when name (print "Project:     " name))
+  (when-let [r (p :repo)] (print "Repository:  " r))
+  (when-let [a (p :author)] (print "Author:      " a))
   (defn getchunk [buf p]
     (def [line] (parser/where p))
     (getline (string "pjm[" (or name "repl") "]:" line ":" (parser/state p :delimiters) "> ") buf env))

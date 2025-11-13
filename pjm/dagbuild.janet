@@ -46,11 +46,11 @@
   (def dep-counts @{})
   (def inv @{})
   (defn visit [node]
-    (if (seen node) (break))
+    (when (seen node) (break))
     (put seen node true)
     (def depends-on (get dag node []))
     (put dep-counts node (length depends-on))
-    (if (empty? depends-on)
+    (when (empty? depends-on)
       (ev/give q node))
     (each r depends-on
       (put inv r (array/push (get inv r @[]) node))
@@ -63,9 +63,9 @@
   (var short-circuit false)
   (defn worker [n]
     (while (next seen)
-      (if short-circuit (break))
+      (when short-circuit (break))
       (def node (ev/take q))
-      (if-not node (break))
+      (unless node (break))
       (when (in seen node)
         (put seen node nil)
         (def status (f node))

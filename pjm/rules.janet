@@ -46,13 +46,13 @@
   Inputs are guaranteed to already be in the utd-cache."
   [target all-targets utd-cache] 
   (def rule (get all-targets target))
-  (if (= target (get rule :task)) (break false))
+  (when (= target (get rule :task)) (break false))
   (def mtime (os/stat target :modified))
-  (if-not rule (break (or mtime (target-not-found target))))
-  (if (not mtime) (break false))
+  (unless rule (break (or mtime (target-not-found target))))
+  (when (not mtime) (break false))
   (var ret true)
   (each i (get rule :inputs [])
-    (if-not (get utd-cache i) (break (set ret false)))
+    (unless (get utd-cache i) (break (set ret false)))
     (def s (os/stat i :modified))
     (when (or (not s) (< mtime s))
       (set ret false)
@@ -83,7 +83,7 @@
       (set (utd-cache target) (utd target all-targets utd-cache))))
 
   (defn visit [target]
-    (if (in seen target) (break))
+    (when (in seen target) (break))
     (put seen target true)
     (def rule (get all-targets target))
     (def inputs (get rule :inputs []))
@@ -94,7 +94,7 @@
       (def deps (set (dag rule) (get dag rule @[])))
       (each i inputs
         (unless (utd1 i)
-          (if-let [r (get all-targets i)]
+          (when-let [r (get all-targets i)]
             (array/push deps r))))))
 
   (each t targets (visit t))
@@ -152,7 +152,7 @@
   (def targets (getrules))
   (unless (get targets target)
     (def new-rule
-      @{:task (if phony target)
+      @{:task (when phony target)
         :inputs @[]
         :outputs @[]
         :recipe @[]})

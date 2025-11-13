@@ -10,7 +10,7 @@
   default value dflt if no dynamic binding is set."
   [opts key &opt dflt]
   (def ret (or (get opts key) (dyn key dflt)))
-  (if (= nil ret)
+  (when (= nil ret)
     (error (string "option :" key " not set")))
   ret)
 
@@ -73,7 +73,7 @@
 
 (defn- parse-integer
   [kw x]
-  (if-let [n (scan-number x)]
+  (when-let [n (scan-number x)]
     (if (not= n (math/floor n))
       (errorf "option :%s, expected integer, got %v" kw x)
       n)
