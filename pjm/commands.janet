@@ -317,7 +317,10 @@
   (when-let [a (p :author)] (print "Author:      " a))
   (defn getchunk [buf p]
     (def [line] (parser/where p))
-    (getline (string "pjm[" (or name "repl") "]:" line ":" (parser/state p :delimiters) "> ") buf env))
+    (getline (string "pjm[" (or name "repl") "]:"
+                     line ":"
+                     (parser/state p :delimiters) "> ")
+             buf env))
   (repl getchunk nil env))
 
 (defn set-tree

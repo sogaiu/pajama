@@ -86,8 +86,11 @@
   "Generate many defines. Takes a dictionary of defines. If a value is
   true, generates -DNAME (/DNAME on windows), otherwise -DNAME=value."
   [defines]
-  (def ret (seq [[d v] :pairs defines] (make-define d (when (not= v true) v))))
-  (array/push ret (make-define "JANET_BUILD_TYPE" (cnf/dyn:build-type "release")))
+  (def ret
+    (seq [[d v] :pairs defines]
+      (make-define d (when (not= v true) v))))
+  (array/push ret
+              (make-define "JANET_BUILD_TYPE" (cnf/dyn:build-type "release")))
   ret)
 
 (defn- getflags
@@ -135,7 +138,9 @@
   (def defines [;(make-defines (cnf/opt opts :defines {})) ;entry-defines])
   (def headers (or (opts :headers) []))
   (r/rule dest [src ;headers]
-          (unless (cnf/dyn:verbose) (print "compiling " src " to " dest "...") (flush))
+          (unless (cnf/dyn:verbose)
+            (print "compiling " src " to " dest "...")
+            (flush))
           (sh/create-dirs dest)
           (if (dyn :is-msvc)
             (sh/clexe-shell cc ;defines "/c" ;cflags (string "/Fo" dest) src)
@@ -153,29 +158,38 @@
     (if (sh/is-win-or-mingw)
       (dyn :importlibext)
       (dyn :modext)))
-  (def dep-ldflags (seq [x :in deplibs] (string (cnf/dyn:modpath) "/" x linkext)))
+  (def dep-ldflags
+    (seq [x :in deplibs]
+      (string (cnf/dyn:modpath) "/" x linkext)))
   # Use import libs on windows - we need an import lib to link natives to other natives.
   (def dep-importlibs
     (if (sh/is-win-or-mingw)
-      (seq [x :in deplibs] (string (cnf/dyn:modpath) "/" x (dyn :importlibext)))
+      (seq [x :in deplibs]
+        (string (cnf/dyn:modpath) "/" x (dyn :importlibext)))
       @[]))
   (when-let [import-lib (dyn :janet-importlib)]
     (array/push dep-importlibs import-lib))
   (def dep-importlibs (distinct dep-importlibs))
   (def ldflags [;(cnf/opt opts :ldflags []) ;dep-ldflags])
   (r/rule target objects
-          (unless (cnf/dyn:verbose) (print "creating native module " target "...") (flush))
+          (unless (cnf/dyn:verbose)
+            (print "creating native module " target "...")
+            (flush))
           (sh/create-dirs target)
           (if (dyn :is-msvc)
-            (sh/clexe-shell linker (string "/OUT:" target) ;objects ;dep-importlibs ;ldflags ;lflags)
-            (sh/shell linker ;cflags `-o` target ;objects ;dep-importlibs ;ldflags ;lflags))))
+            (sh/clexe-shell linker (string "/OUT:" target) ;objects
+                            ;dep-importlibs ;ldflags ;lflags)
+            (sh/shell linker ;cflags `-o` target ;objects
+                      ;dep-importlibs ;ldflags ;lflags))))
 
 (defn archive-c
   "Link object files together to make a static library."
   [opts target & objects]
   (def ar (cnf/opt opts :ar))
   (r/rule target objects
-          (unless (cnf/dyn:verbose) (print "creating static library " target "...") (flush))
+          (unless (cnf/dyn:verbose)
+            (print "creating static library " target "...")
+            (flush))
           (sh/create-dirs target)
           (if (dyn :is-msvc)
             (sh/shell ar "/nologo" (string "/out:" target) ;objects)
@@ -212,12 +226,14 @@
 (defn modpath-to-meta
   "Get the meta file path (.meta.janet) corresponding to a native module path (.so)."
   [path]
-  (string (string/slice path 0 (- (length (cnf/dyn:modext)))) "meta.janet"))
+  (string (string/slice path 0 (- (length (cnf/dyn:modext))))
+          "meta.janet"))
 
 (defn modpath-to-static
   "Get the static library (.a) path corresponding to a native module path (.so)."
   [path]
-  (string (string/slice path 0 (- -1 (length (cnf/dyn:modext)))) (cnf/dyn:statext)))
+  (string (string/slice path 0 (- -1 (length (cnf/dyn:modext))))
+          (cnf/dyn:statext)))
 
 (defn make-bin-source
   [declarations lookup-into-invocations no-core]
@@ -332,7 +348,8 @@ int main(int argc, const char **argv) {
   (def no-compile (opts :no-compile))
   (def bd (sh/find-build-dir))
   (r/rule (if no-compile cimage_dest dest) [source]
-          (print "generating executable c source " cimage_dest " from " source "...")
+          (printf "generating executable c source %s from %s..."
+                  cimage_dest source)
           (flush)
           (sh/create-dirs dest)
 
@@ -405,14 +422,20 @@ int main(int argc, const char **argv) {
             # Make image byte buffer
             (create-buffer-c-impl image cimage_dest "janet_payload_image")
             # Append main function
-            (spit cimage_dest (make-bin-source declarations lookup-into-invocations no-core) :ab)
+            (spit cimage_dest
+                  (make-bin-source declarations lookup-into-invocations no-core)
+                  :ab)
             (def oimage_dest (out-path cimage_dest ".c" ".o"))
             # Compile and link final exectable
             (unless no-compile
               (def ldflags [;dep-ldflags ;(cnf/opt opts :ldflags [])])
               (def lflags [;static-libs
-                           (string (cnf/dyn:libpath) "/libjanet." (last (string/split "." (cnf/dyn:statext))))
-                           ;dep-lflags ;(cnf/opt opts :lflags []) ;(cnf/dyn:janet-lflags)])
+                           (string (cnf/dyn:libpath)
+                                   "/libjanet."
+                                   (last (string/split "." (cnf/dyn:statext))))
+                           ;dep-lflags
+                           ;(cnf/opt opts :lflags [])
+                           ;(cnf/dyn:janet-lflags)])
               (def defines (make-defines (cnf/opt opts :defines {})))
               (def cc (cnf/opt opts :cc))
               (def cflags [;(getflags opts :cc) ;(cnf/dyn:janet-cflags)])
@@ -420,20 +443,29 @@ int main(int argc, const char **argv) {
               (flush)
               (sh/create-dirs oimage_dest)
               (if (cnf/dyn:is-msvc)
-                (sh/clexe-shell cc ;defines "/c" ;cflags (string "/Fo" oimage_dest) cimage_dest)
-                (sh/shell cc "-c" cimage_dest ;defines ;cflags "-o" oimage_dest))
+                (sh/clexe-shell cc ;defines "/c" ;cflags
+                                (string "/Fo" oimage_dest) cimage_dest)
+                (sh/shell cc "-c" cimage_dest ;defines ;cflags
+                          "-o" oimage_dest))
               (if has-cpp
-                (let [linker (cnf/opt opts (if (dyn :is-msvc) :c++-link :c++))
-                      cppflags [;(getflags opts :c++) ;(cnf/dyn:janet-cflags)]]
+                (let [linker (cnf/opt opts
+                                      (if (dyn :is-msvc) :c++-link :c++))
+                      cppflags [;(getflags opts :c++)
+                                ;(cnf/dyn:janet-cflags)]]
                   (print "linking " dest "...")
                   (flush)
                   (if (cnf/dyn:is-msvc)
-                    (sh/clexe-shell linker (string "/OUT:" dest) oimage_dest ;ldflags ;lflags)
-                    (sh/shell linker ;cppflags `-o` dest oimage_dest ;ldflags ;lflags)))
-                (let [linker (cnf/opt opts (if (cnf/dyn:is-msvc) :cc-link :cc))]
+                    (sh/clexe-shell linker (string "/OUT:" dest) oimage_dest
+                                    ;ldflags ;lflags)
+                    (sh/shell linker ;cppflags `-o` dest oimage_dest
+                              ;ldflags ;lflags)))
+                (let [linker (cnf/opt opts
+                                      (if (cnf/dyn:is-msvc) :cc-link :cc))]
                   (print "linking " dest "...")
                   (flush)
                   (sh/create-dirs dest)
                   (if (cnf/dyn:is-msvc)
-                    (sh/clexe-shell linker (string "/OUT:" dest) oimage_dest ;ldflags ;lflags)
-                    (sh/shell linker ;cflags `-o` dest oimage_dest ;ldflags ;lflags))))))))
+                    (sh/clexe-shell linker (string "/OUT:" dest) oimage_dest
+                                    ;ldflags ;lflags)
+                    (sh/shell linker ;cflags `-o` dest oimage_dest
+                              ;ldflags ;lflags))))))))

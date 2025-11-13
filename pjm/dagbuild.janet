@@ -20,7 +20,9 @@
   (def res @[])
   (def fibers
     (seq [[i x] :pairs data]
-      (ev/go (fiber/new (fn pmap-worker [] (put res i (f x))) :tp) nil chan)))
+      (ev/go (fiber/new (fn pmap-worker []
+                          (put res i (f x))) :tp)
+             nil chan)))
   (repeat (length fibers)
     (def [sig fiber] (ev/take chan))
     (unless (= sig :ok)
@@ -53,7 +55,8 @@
     (when (empty? depends-on)
       (ev/give q node))
     (each r depends-on
-      (put inv r (array/push (get inv r @[]) node))
+      (put inv r
+           (array/push (get inv r @[]) node))
       (visit r)))
   (eachk r dag (visit r))
 
@@ -75,7 +78,8 @@
           (put res node status)))
       (unless short-circuit
         (each r (get inv node [])
-          (when (zero? (set (dep-counts r) (dec (get dep-counts r 1))))
+          (when (zero? (set (dep-counts r)
+                            (dec (get dep-counts r 1))))
             (ev/give q r)))))
     (ev/give q nil))
 

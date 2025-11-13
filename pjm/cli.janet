@@ -121,7 +121,10 @@
 (defmacro pjm
   "A Macro User Interface for pjm to be used from a repl in a way similar to the command line."
   [& argv]
-  ~(,run ,;(map |(if (bytes? $) (string $) $) argv)))
+  ~(,run ,;(map |(if (bytes? $)
+                   (string $)
+                   $)
+                argv)))
 
 (defn main
   "Script entry."

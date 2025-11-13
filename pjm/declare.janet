@@ -89,7 +89,8 @@
           (string/has-suffix? ".cc" src) ".cc"
           (string/has-suffix? ".c" src) ".c"
           (string/has-suffix? ".janet" src) ".janet"
-          (errorf "unknown source file type: %s, expected .c, .cc, .cpp, or .janet" src)))
+          (errorf "unknown source file type: %s, expected %s, %s, %s, or %s"
+                  src ".c" ".cc" ".cpp" ".janet")))
       (def op (cc/out-path src suffix ".o"))
       (case suffix
         ".c" (cc/compile-c :cc opts src op)
@@ -98,7 +99,8 @@
                    (def csrc (cc/out-path src suffix ".c"))
                    (r/rule csrc [src] (dofile-codegen src csrc))
                    (cc/compile-c :cc opts csrc op))
-        (do (cc/compile-c :c++ opts src op)
+        (do
+          (cc/compile-c :c++ opts src op)
           (set has-cpp true)))
       op))
 
@@ -136,7 +138,9 @@
   # Make static module
   (unless (dyn :nostatic)
     (def sname (string (sh/find-build-dir) name statext))
-    (def impname (if importlibext (string (sh/find-build-dir) name importlibext) nil))
+    (def impname (if importlibext
+                   (string (sh/find-build-dir) name importlibext)
+                   nil))
     (def opts (merge @{:entry-name ename} opts))
     (def sobjext ".static.o")
     (def sjobjext ".janet.static.o")
@@ -150,7 +154,8 @@
             (string/has-suffix? ".cc" src) ".cc"
             (string/has-suffix? ".c" src) ".c"
             (string/has-suffix? ".janet" src) ".janet"
-            (errorf "unknown source file type: %s, expected .c, .cc, .cpp, or .janet" src)))
+            (errorf "unknown source file type: %s, expected %s, %s, %s, or %s"
+                    src ".c" ".cc" ".cpp" ".janet")))
         (def op (cc/out-path src suffix sobjext))
         (case suffix
           ".c" (cc/compile-c :cc opts src op true)
@@ -159,10 +164,10 @@
                      (r/rule csrc [src] (dofile-codegen src csrc))
                      (cc/compile-c :cc opts csrc op true))
           (cc/compile-c :c++ opts src op true))
-        # Add artificial dep between static object and non-static object - prevents double errors
-        # when doing default builds.
-        (r/add-dep op (cc/out-path src suffix ".o"))
-        op))
+    # Add artificial dep between static object and non-static object -
+    # prevents double errors when doing default builds.
+    (r/add-dep op (cc/out-path src suffix ".o"))
+    op))
 
     (when-let [embedded (opts :embedded)]
       (loop [src :in embedded]
@@ -228,9 +233,13 @@
   [&keys {:install install :name name :entry entry :headers headers
           :cflags cflags :lflags lflags :deps deps :ldflags ldflags
           :no-compile no-compile :no-core no-core}]
-  (def name (if (sh/is-win-or-mingw) (string name ".exe") name))
+  (def name (if (sh/is-win-or-mingw)
+              (string name ".exe")
+              name))
   (def dest (string (sh/find-build-dir) name))
-  (cc/create-executable @{:cflags cflags :lflags lflags :ldflags ldflags :no-compile no-compile} entry dest no-core)
+  (cc/create-executable @{:cflags cflags :lflags lflags
+                          :ldflags ldflags :no-compile no-compile}
+                        entry dest no-core)
   (if no-compile
     (let [cdest (string dest ".c")]
       (r/add-dep "build" cdest))
@@ -264,7 +273,8 @@
               (def contents
                 (with [f (file/open main :rbn)]
                   (def first-line (:read f :line))
-                  (def second-line (string/format "(put root-env :syspath %v)\n" syspath))
+                  (def second-line
+                    (string/format "(put root-env :syspath %v)\n" syspath))
                   (def rest (:read f :all))
                   (string (when auto-shebang
                             (string "#!" (cnf/dyn:binpath) "/janet\n"))
@@ -384,10 +394,12 @@
                 (when-let [shallow (dyn :shallow)]
                   (put man :shallow shallow))
                 (protect
-                  (when-let [x (sh/exec-slurp (cnf/dyn:gitpath) "remote" "get-url" "origin")]
+                  (when-let [x (sh/exec-slurp (cnf/dyn:gitpath)
+                                              "remote" "get-url" "origin")]
                     (put man :url (unless (empty? x) x))))
                 (protect
-                  (when-let [x (sh/exec-slurp (cnf/dyn:gitpath) "rev-parse" "HEAD")]
+                  (when-let [x (sh/exec-slurp (cnf/dyn:gitpath)
+                                              "rev-parse" "HEAD")]
                     (put man :tag (unless (empty? x) x)))))
               :tar
               (do

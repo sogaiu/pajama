@@ -214,9 +214,10 @@
   (if (is-win-or-mingw)
     (let [end (last (peg/match path-splitter src))
           isdir (= (os/stat src :mode) :directory)]
-      (shell "C:\\Windows\\System32\\xcopy.exe"
-             (string/replace-all "/" "\\" src)
-             (string/replace-all "/" "\\" (if isdir (string dest "\\" end) dest))
+      (shell `C:\Windows\System32\xcopy.exe`
+             (string/replace-all "/" `\` src)
+             (string/replace-all "/" `\`
+                                 (if isdir (string dest `\` end) dest))
              "/y" "/s" "/e" "/i"))
     (shell "cp" "-rf" src dest)))
 
@@ -268,9 +269,13 @@
 (defn dirname
   "Get the directory of a file without the filename."
   [path]
-  (string/join (slice (peg/match path-splitter path) 0 -2) "/"))
+  (string/join (slice (peg/match path-splitter path) 0 -2)
+               "/"))
 
-(defn- check-is-dep [x] (unless (or (string/has-prefix? "/" x) (string/has-prefix? "." x)) x))
+(defn- check-is-dep
+  [x]
+  (unless (or (string/has-prefix? "/" x) (string/has-prefix? "." x))
+    x))
 
 (defn do-monkeypatch
   ``
@@ -280,7 +285,8 @@
   [build-dir]
   (def old-builddir (dyn :build-dir))
   (put root-env :build-dir build-dir)
-  (array/insert module/paths 1 [(string build-dir ":all::native:") :native check-is-dep])
+  (array/insert module/paths 1
+                [(string build-dir ":all::native:") :native check-is-dep])
   old-builddir)
 
 (defn undo-monkeypatch

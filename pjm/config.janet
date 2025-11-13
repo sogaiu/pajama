@@ -173,9 +173,11 @@
     (def value (dyn k))
     (when (and options (not (index-of value options)))
       (when (not= nil value)
-        (errorf "invalid configuration option %v, expected one of %j, got %v" k options value)))
+        (errorf "invalid configuration option %v, expected one of %j, got %v"
+                k options value)))
     (when (and checker (not (checker value)))
-      (errorf "invalid configuration option %v, expected %v, got %v" k ctype value)))
+      (errorf "invalid configuration option %v, expected %v, got %v"
+              k ctype value)))
   # Final patches
   (unless (dyn :modpath)
     (setdyn :modpath (dyn :syspath)))
@@ -245,54 +247,99 @@
    "t" :test})
 
 # All pjm settings.
-(defconf :binpath :string "The directory to install executable binaries and scripts to")
-(defconf :config-file :string-opt "A config file to load to load settings from")
-(defconf :gitpath :string "The path or command name of git used by pjm")
-(defconf :tarpath :string "The path or command name of tar used by pjm")
-(defconf :curlpath :string "The path or command name of curl used by pjm")
-(defconf :headerpath :string "Directory containing Janet headers")
-(defconf :manpath :string-opt "Directory to install man pages to")
-(defconf :janet :string "The path or command name of the Janet binary used when spawning janet subprocesses")
+(defconf :binpath :string
+  "The directory to install executable binaries and scripts to")
+(defconf :config-file :string-opt
+  "A config file to load to load settings from")
+(defconf :gitpath :string
+  "The path or command name of git used by pjm")
+(defconf :tarpath :string
+  "The path or command name of tar used by pjm")
+(defconf :curlpath :string
+  "The path or command name of curl used by pjm")
+(defconf :headerpath :string
+  "Directory containing Janet headers")
+(defconf :manpath :string-opt
+  "Directory to install man pages to")
+(defconf :janet :string
+  "The path or command name of the Janet binary used when spawning janet subprocesses")
 (defconf :libpath :string
-  "The directory that contains janet libraries for standalone binaries and other native artifacts")
-(defconf :modpath :string-opt "The directory tree to install packages to")
-(defconf :optimize :int-opt "The default optimization level to use for C/C++ compilation if otherwise unspecified" [0 1 2 3])
-(defconf :pkglist :string-opt "The package listing bundle to use for mapping short package names to full URLs.")
-(defconf :offline :boolean "Do not download remote repositories when installing packages")
-(defconf :update-pkgs :boolean "Update package listing before doing anything.")
-(defconf :buildpath :string-opt "The path to output intermediate files and build outputs to. Default is build/")
+  "The directory containing janet libraries for standalone binaries and other native artifacts")
+(defconf :modpath :string-opt
+  "The directory tree to install packages to")
+(defconf :optimize :int-opt
+  "The default optimization level to use for C/C++ compilation if otherwise unspecified"
+  [0 1 2 3])
+(defconf :pkglist :string-opt
+  "The package listing bundle to use for mapping short package names to full URLs.")
+(defconf :offline :boolean
+  "Do not download remote repositories when installing packages")
+(defconf :update-pkgs :boolean
+  "Update package listing before doing anything.")
+(defconf :buildpath :string-opt
+  "The path to output intermediate files and build outputs to. Default is build/")
 
 # Settings that probably shouldn't be set from the command line.
-(defconf :ar :string "The archiver used to generate static C/C++ libraries")
-(defconf :c++ :string "The C++ compiler to use for natives")
-(defconf :c++-link :string "The C++ linker to use for natives - on posix, should be the same as the compiler")
-(defconf :cc :string "The C compiler to use for natives")
-(defconf :cc-link :string "The C linker to use for natives - on posix, should be the same as the compiler")
-(defconf :cflags :string-array "List of flags to pass when compiling .c files to object files")
-(defconf :cppflags :string-array "List of flags to pass when compiling .cpp files to object files")
-(defconf :cflags-verbose :string-array "List of extra flags to pass when compiling in verbose mode")
-(defconf :dynamic-cflags :string-array "List of flags to pass only when compiler shared objects")
-(defconf :dynamic-lflags :string-array "List of flags to pass when linking shared objects")
-(defconf :is-msvc :boolean "Switch to turn on if using MSVC compiler instead of POSIX compliant compiler")
-(defconf :ldflags :string-array "Linker flags for OS libraries needed when compiling C/C++ artifacts")
-(defconf :lflags :string-array "Non-library linker flags when compiling C/C++ artifacts")
-(defconf :modext :string "File extension for shared objects")
-(defconf :statext :string "File extension for static libraries")
-(defconf :use-batch-shell :boolean "Switch to turn on if using the Batch shell on windows instead of POSIX shell")
-(defconf :janet-lflags :string-array "Link flags to pass when linking to libjanet")
-(defconf :janet-cflags :string-array "Compiler flags to pass when linking to libjanet")
-(defconf :janet-importlib :string-opt "Import library that lets native modules link to the host program (usually the interpreter)")
+(defconf :ar :string
+  "The archiver used to generate static C/C++ libraries")
+(defconf :c++ :string
+  "The C++ compiler to use for natives")
+(defconf :c++-link :string
+  "The C++ linker to use for natives - on posix, should be the same as the compiler")
+(defconf :cc :string
+  "The C compiler to use for natives")
+(defconf :cc-link :string
+  "The C linker to use for natives - on posix, should be the same as the compiler")
+(defconf :cflags :string-array
+  "List of flags to pass when compiling .c files to object files")
+(defconf :cppflags :string-array
+  "List of flags to pass when compiling .cpp files to object files")
+(defconf :cflags-verbose :string-array
+  "List of extra flags to pass when compiling in verbose mode")
+(defconf :dynamic-cflags :string-array
+  "List of flags to pass only when compiler shared objects")
+(defconf :dynamic-lflags :string-array
+  "List of flags to pass when linking shared objects")
+(defconf :is-msvc :boolean
+  "Switch to turn on if using MSVC compiler instead of POSIX compliant compiler")
+(defconf :ldflags :string-array
+  "Linker flags for OS libraries needed when compiling C/C++ artifacts")
+(defconf :lflags :string-array
+  "Non-library linker flags when compiling C/C++ artifacts")
+(defconf :modext :string
+  "File extension for shared objects")
+(defconf :statext :string
+  "File extension for static libraries")
+(defconf :use-batch-shell :boolean
+  "Switch to turn on if using the Batch shell on windows instead of POSIX shell")
+(defconf :janet-lflags :string-array
+  "Link flags to pass when linking to libjanet")
+(defconf :janet-cflags :string-array
+  "Compiler flags to pass when linking to libjanet")
+(defconf :janet-importlib :string-opt
+  "Import library that lets native modules link to the host program (usually the interpreter)")
 
 # Settings that should probably only be set from the command line
-(defconf :auto-shebang :boolean "Automatically add a shebang line to installed janet scripts")
-(defconf :silent :boolean "Show less output than usually and silence output from subprocesses")
-(defconf :verbose :boolean "Show more ouput than usual and turn on warn flags in compilers")
-(defconf :workers :int-opt "The number of parallel workers to build with")
-(defconf :nocolor :boolean "Disables color in the debug repl")
-(defconf :test :boolean "Enable testing when installing.")
-(defconf :local :boolean "Switch to use a local tree ./pjm_tree instead of the config specified tree.")
-(defconf :tree :string-opt "Switch to use a custom tree instead of the config specified tree.")
-(defconf :dest-dir :string-opt "Prefix to add to installed files. Useful for bootstrapping.")
-(defconf :build-type :string-opt "A preset of options for debug, release, and develop builds." ["release" "debug" "develop"])
+(defconf :auto-shebang :boolean
+  "Automatically add a shebang line to installed janet scripts")
+(defconf :silent :boolean
+  "Show less output than usually and silence output from subprocesses")
+(defconf :verbose :boolean
+  "Show more ouput than usual and turn on warn flags in compilers")
+(defconf :workers :int-opt
+  "The number of parallel workers to build with")
+(defconf :nocolor :boolean
+  "Disables color in the debug repl")
+(defconf :test :boolean
+  "Enable testing when installing.")
+(defconf :local :boolean
+  "Switch to use a local tree ./pjm_tree instead of the config specified tree.")
+(defconf :tree :string-opt
+  "Switch to use a custom tree instead of the config specified tree.")
+(defconf :dest-dir :string-opt
+  "Prefix to add to installed files. Useful for bootstrapping.")
+(defconf :build-type :string-opt
+  "A preset of options for debug, release, and develop builds."
+  ["release" "debug" "develop"])
 
 (set builtins-loaded true)

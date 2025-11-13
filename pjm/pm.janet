@@ -92,7 +92,8 @@
   ``
   [path &opt base-env]
   (def env (require-pjm path base-env))
-  (when-let [rules (get env :rules)] (merge-into (r/getrules) rules))
+  (when-let [rules (get env :rules)]
+    (merge-into (r/getrules) rules))
   (when-let [project (get env :project)]
     (setdyn :project (merge-into (dyn :project @{}) project)))
   env)
@@ -139,19 +140,25 @@
   (if (dictionary? bundle)
     (do
       (set repo (or (get bundle :url) (get bundle :repo)))
-      (set tag (or (get bundle :tag) (get bundle :sha) (get bundle :commit) (get bundle :ref)))
+      (set tag (or (get bundle :tag) (get bundle :sha)
+                   (get bundle :commit) (get bundle :ref)))
       (set btype (get bundle :type :git))
       (set shallow (get bundle :shallow false)))
     (let [parts (string/split "::" bundle)]
       (case (length parts)
         1 (set repo (get parts 0))
-        2 (do (set repo (get parts 1)) (set btype (keyword (get parts 0))))
+        2 (do
+            (set repo (get parts 1))
+            (set btype (keyword (get parts 0))))
         3 (do
             (set btype (keyword (get parts 0)))
             (set repo (get parts 1))
             (set tag (get parts 2)))
         (errorf "unable to parse bundle string %v" bundle))))
-  {:url (resolve-bundle-name repo) :tag tag :type btype :shallow shallow})
+  {:url (resolve-bundle-name repo)
+   :tag tag
+   :type btype
+   :shallow shallow})
 
 (comment
 
@@ -186,9 +193,9 @@
   (if shallow
     (git "-C" bundle-dir "fetch" "--depth" "1" "origin" (or tag "HEAD"))
     (do
-      # Tag can be a hash, e.g. in lockfile. Some Git servers don't allow
-      # fetching arbitrary objects by hash. First fetch ensures, that we have
-      # all objects locally.
+      # Tag can be a hash, e.g. in lockfile. Some Git servers don't
+      # allow fetching arbitrary objects by hash. First fetch ensures,
+      # that we have all objects locally.
       (git "-C" bundle-dir "fetch" "--tags" "origin")
       (git "-C" bundle-dir "fetch" "origin" (or tag "HEAD"))))
   (git "-C" bundle-dir "reset" "--hard" "FETCH_HEAD"))
@@ -199,7 +206,7 @@
   (var fresh false)
   (if (dyn :offline)
     (if (not= :directory (os/stat bundle-dir :mode))
-      (error (string "did not find cached repository for dependency " url))
+      (errorf "did not find cached repository for dependency %s" url)
       (set fresh true))
     (when (os/mkdir bundle-dir)
       (set fresh true)
@@ -220,7 +227,11 @@
   [bundle-dir url &opt force-gz]
   (def has-gz (string/has-suffix? "gz" url))
   (def is-remote (string/find ":" url))
-  (def dest-archive (if is-remote (string bundle-dir "/bundle-archive." (if has-gz "tar.gz" "tar")) url))
+  (def dest-archive (if is-remote
+                      (string bundle-dir
+                              "/bundle-archive."
+                              (if has-gz "tar.gz" "tar"))
+                      url))
   (os/mkdir bundle-dir)
   (when is-remote
     (curl "-sL" url "--output" dest-archive))
@@ -246,14 +257,15 @@
 
 (var- installed-bundle-index nil)
 (defn is-bundle-installed
-  "Determines if a bundle has been installed or not"
+  "Determines if a bundle has been installed or not."
   [bundle]
   # initialize bundle index
   (unless installed-bundle-index
     (set installed-bundle-index @{})
     (os/mkdir (sh/find-manifest-dir))
     (each manifest (os/dir (sh/find-manifest-dir))
-      (def bundle-data (parse (slurp (string (sh/find-manifest-dir) "/" manifest))))
+      (def bundle-data
+        (-> (string (sh/find-manifest-dir) "/" manifest) slurp parse))
       (def {:url u :repo r :tag s :type t :shallow a} bundle-data)
       (put installed-bundle-index (or u r) {:tag s
                                             :type t
@@ -311,7 +323,8 @@
     (def package (parse (slurp (string mdir "/"  man))))
     (if (and (dictionary? package) (or (package :url) (package :repo)))
       (array/push packages package)
-      (print "Cannot add local or malformed package " mdir "/" man " to lockfile, skipping...")))
+      (printf "Cannot add local or malformed package %s/%s to lockfile, skipping..."
+              mdir man)))
 
   # Scramble to simulate runtime randomness (when trying to repro, order can
   # be remarkably stable) - see janet-lang/janet issue #1082
@@ -334,12 +347,15 @@
       (unless (resolved key)
         (when (all resolved dep-bundles)
           (print "item: " (or u r))
-          (array/push ordered-packages {:url (or u r) :tag s :type t :shallow a})
+          (array/push ordered-packages
+                      {:url (or u r) :tag s :type t :shallow a})
           (set made-progress true)
           (put resolved key true))))
     (unless made-progress
       (error (string/format "could not resolve package order for: %j"
-                            (filter (complement resolved) (map |(or ($ :url) ($ :repo)) packages))))))
+                            (->> (map |(or ($ :url) ($ :repo))
+                                      packages)
+                                 (filter (complement resolved)))))))
   # Write to file, manual format for better diffs.
   (with [f (file/open filename :wn)]
     (with-dyns [:out f]
@@ -360,9 +376,12 @@
     (bundle-install bundle true)))
 
 (defmacro post-deps
-  "Run code at the top level if pjm dependencies are installed. Build
-  code that imports dependencies should be wrapped with this macro, as project.janet
-  needs to be able to run successfully even without dependencies installed."
+  ``
+  Run code at the top level if pjm dependencies are installed. Build
+  code that imports dependencies should be wrapped with this macro,
+  as project.janet needs to be able to run successfully even without
+  dependencies installed.
+  ``
   [& body]
   (unless (dyn :pjm-no-deps)
     ~',(reduce |(eval $1) nil body)))
@@ -386,15 +405,21 @@
         (bundle-install new-bundle true true)
         (++ updated-count))
       ([err f]
-        (debug/stacktrace f err (string "unable to update dependency " p ": ")))))
-  (print "updated " updated-count " of " (length to-update) " installed packages")
+        (debug/stacktrace f err
+                          (string "unable to update dependency " p ": ")))))
+  (printf "updated %d of %d installed packages"
+          updated-count (length to-update))
   (unless (= updated-count (length to-update))
     (error "could not update all installed packages")))
 
 (defn out-of-tree-config
-  "Create an out of tree build configuration. This lets a user have a debug or release build, as well
-  as other configuration on a one time basis. This works by creating a new directory with
-  a project.janet that loads in the original project.janet file with some settings changed."
+  ``
+  Create an out of tree build configuration. This lets a user have
+  a debug or release build, as well as other configuration on a one
+  time basis. This works by creating a new directory with a
+  project.janet that loads in the original project.janet file with
+  some settings changed.
+  ``
   [path &opt options]
   (def current (sh/abspath (os/cwd)))
   (def options (merge-into @{} options))
