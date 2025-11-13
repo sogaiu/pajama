@@ -314,7 +314,7 @@
       (print "Cannot add local or malformed package " mdir "/" man " to lockfile, skipping...")))
 
   # Scramble to simulate runtime randomness (when trying to repro, order can
-  # be remarkable stable) - see janet-lang/janet issue #1082
+  # be remarkably stable) - see janet-lang/janet issue #1082
   # (def rand-thing (string (os/cryptorand 16)))
   # (sort-by |(hash [rand-thing (get $ :url)]) packages)
 

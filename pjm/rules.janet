@@ -102,7 +102,7 @@
 
 #
 # Convenience wrappers for defining a rule graph.
-# Must be mostly compatible with old pjm interface.
+# Must be mostly compatible with old jpm interface.
 # Main differences are multiple outputs for a rule are allowed,
 # and a rule cannot have both phony and non-phony thunks.
 #
