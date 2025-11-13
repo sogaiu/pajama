@@ -297,9 +297,17 @@
 (defn- make-monkeypatch
   [build-dir]
   (string/format
-    `(defn- check-is-dep [x] (unless (or (string/has-prefix? "/" x) (string/has-prefix? "." x)) x))
+    ``
+    (defn- check-is-dep
+      [x]
+      (unless (or (string/has-prefix? "/" x) (string/has-prefix? "." x))
+        x))
+
     (put root-env :build-dir %v)
-    (array/insert module/paths 1 [%v :native check-is-dep])`
+
+    (array/insert module/paths 1
+                  [%v :native check-is-dep])
+    ``
     build-dir
     (string build-dir ":all:" (cnf/dyn:modext))))
 
