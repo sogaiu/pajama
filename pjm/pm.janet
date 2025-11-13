@@ -147,6 +147,33 @@
         (errorf "unable to parse bundle string %v" bundle))))
   {:url (resolve-bundle-name repo) :tag tag :type btype :shallow shallow})
 
+(comment
+
+  (resolve-bundle "https://github.com/janet-lang/spork")
+  # =>
+  {:shallow false
+   :type :git
+   :url "https://github.com/janet-lang/spork"}
+
+  (resolve-bundle {:tag "e939a040f7183a518d9b396d017e1773e228a4c3"
+                   :url "https://github.com/janet-lang/spork"})
+  # =>
+  {:shallow false
+   :tag "e939a040f7183a518d9b396d017e1773e228a4c3"
+   :type :git
+   :url "https://github.com/janet-lang/spork"}
+
+  (resolve-bundle (string "git::"
+                          "https://github.com/janet-lang/spork::"
+                          "e939a040f7183a518d9b396d017e1773e228a4c3"))
+  # =>
+  {:shallow false
+   :tag "e939a040f7183a518d9b396d017e1773e228a4c3"
+   :type :git
+   :url "https://github.com/janet-lang/spork"}
+
+  )
+
 (defn update-git-bundle
   "Fetch latest tag version from remote repository"
   [bundle-dir tag shallow]

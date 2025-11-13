@@ -70,6 +70,18 @@
     (string "-D" define "=" value)
     (string "-D" define)))
 
+(comment
+
+  (make-define "COOL_KNOB" "OFF")
+  # =>
+  "-DCOOL_KNOB=OFF"
+
+  (make-define "SHIELDS_UP" nil)
+  # =>
+  "-DSHIELDS_UP"
+
+  )
+
 (defn make-defines
   "Generate many defines. Takes a dictionary of defines. If a value is
   true, generates -DNAME (/DNAME on windows), otherwise -DNAME=value."
