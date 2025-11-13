@@ -18,10 +18,11 @@
 
     Run from a directory containing a project.janet file to perform
     operations on a project, or from anywhere to do operations on the
-    global module cache (modpath).  Commands that need write permission to
-    the modpath are considered privileged commands - in some environments
-    they may require super user privileges.  Other project-level commands
-    need to have a ./project.janet file in the current directory.
+    global module cache (modpath).  Commands that need write permission
+    to the modpath are considered privileged commands - in some
+    environments they may require super user privileges.  Other
+    project-level commands need to have a ./project.janet file in the
+    current directory.
 
     To install/manage packages in a local subtree, use the --local flag
     (or -l) to install packages to ./pjm_tree. This should generally not
@@ -58,13 +59,14 @@
     Privileged global subcommands:
 
         install (repo or name)...
-            Install artifacts. If a repo is given, install the contents of
-            that git repository, assuming that the repository is a pjm
-            project. If not, build and install the current project.
+            Install artifacts. If a repo is given, install the contents
+            of that git repository, assuming that the repository is a
+            pjm project. If not, build and install the current project.
 
         update-installed
-            Reinstall all installed packages. For packages that are not pinned
-            to a specific version, this will get that latest version of packages.
+            Reinstall all installed packages. For packages that are not
+            pinned to a specific version, this will get that latest
+            version of packages.
 
         uninstall (module)...
             Uninstall a module. If no module is given, uninstall the
@@ -105,10 +107,12 @@
     Unprivileged project subcommands:
 
         build
-            Build all artifacts in the build/ directory, or the value specified in --buildpath.
+            Build all artifacts in the build/ directory, or the value 
+            specified in --buildpath.
 
         configure path
-            Create a directory for out-of-tree builds, and also set project options.
+            Create a directory for out-of-tree builds, and also set
+            project options.
 
         clean
             Remove any generated files or artifacts.
@@ -140,8 +144,8 @@
             print their full dependency tree.
 
         repl
-            Run a repl in the same environment as the test environment. Allows
-            you to use built natives without installing them.
+            Run a repl in the same environment as the test environment.
+            Allows you to use built natives without installing them.
 
         debug-repl
             Run a repl in the context of the current project.janet
