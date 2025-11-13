@@ -294,6 +294,7 @@
   (put root-env :build-dir old-builddir)
   (array/remove module/paths 1))
 
+# N.B. remember to sync parts with some of the code above?
 (defn- make-monkeypatch
   [build-dir]
   (string/format
