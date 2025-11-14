@@ -326,15 +326,15 @@
       (printf "Cannot add local or malformed package %s/%s to lockfile, skipping..."
               mdir man)))
 
-  # Scramble to simulate runtime randomness (when trying to repro, order can
-  # be remarkably stable) - see janet-lang/janet issue #1082
+  # Scramble to simulate runtime randomness (when trying to repro,
+  # order can be remarkably stable) - see janet-lang/janet issue #1082
   # (def rand-thing (string (os/cryptorand 16)))
   # (sort-by |(hash [rand-thing (get $ :url)]) packages)
 
   # Sort initially by package url to make stable
   (sort-by |[(get $ :url) (get $ :repo)] packages)
 
-  # Put in correct order, such that a package is preceded by all of its dependencies
+  # Put in correct order, so a package is preceded by all of its dependencies
   (def ordered-packages @[])
   (def resolved @{})
   (while (< (length ordered-packages) (length packages))
