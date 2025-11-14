@@ -17,9 +17,11 @@
   (def ismingw (= :mingw hostos))
   (def win-prefix (os/getenv "JANET_WINDOWS_PREFIX"))
 
-  # Msys2 can do some strange things to paths. Using /usr/local directly may _appear_ to work,
-  # but there is some functionality to rewrite paths like /usr/local/bin/pjm to C:\\msys64\\usr\\local\\bin\\pjm
-  # in some places, where in others it will be converted to D:\\usr\\local\\bin\\pjm
+  # Msys2 can do some strange things to paths. Using /usr/local
+  # directly may _appear_ to work, but there is some functionality to
+  # rewrite paths like /usr/local/bin/pjm to
+  # C:\\msys64\\usr\\local\\bin\\pjm in some places, where in others
+  # it will be converted to D:\\usr\\local\\bin\\pjm
   (def prefix-guess
     (let [de (dyn :executable)
           suffix-win "\\bin\\janet.exe"
