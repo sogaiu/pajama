@@ -2,7 +2,7 @@
 ### Generation of pjm config files based on autodetection.
 ###
 
-(import ./shutil)
+(import ./shutil :as sh)
 
 (defn generate-config
   ``
@@ -74,11 +74,11 @@
   # Generate directories
   (when destdir
     (let [mp (or modpath (dyn :syspath))]
-      (shutil/create-dirs (string destdir mp "/.manifests"))
-      (when manpath (shutil/create-dirs (string destdir manpath)))
-      (when binpath (shutil/create-dirs (string destdir binpath)))
-      (when libpath (shutil/create-dirs (string destdir libpath)))
-      (when headerpath (shutil/create-dirs (string destdir headerpath)))))
+      (sh/create-dirs (string destdir mp "/.manifests"))
+      (when manpath (sh/create-dirs (string destdir manpath)))
+      (when binpath (sh/create-dirs (string destdir binpath)))
+      (when libpath (sh/create-dirs (string destdir libpath)))
+      (when headerpath (sh/create-dirs (string destdir headerpath)))))
 
   (unless silent
     (when destdir (print "destdir: " destdir))
@@ -132,13 +132,13 @@
                 @[])
       :libpath libpath
       :manpath manpath
-      :modext (if (shutil/is-win-or-mingw) ".dll" ".so")
+      :modext (if (sh/is-win-or-mingw) ".dll" ".so")
       :modpath modpath
       :nocolor false
       :pkglist pkglist
       :silent false
-      :importlibext (if (shutil/is-win-or-mingw) ".lib" nil)
-      :statext (if (shutil/is-win-or-mingw) ".static.lib" ".a")
+      :importlibext (if (sh/is-win-or-mingw) ".lib" nil)
+      :statext (if (sh/is-win-or-mingw) ".static.lib" ".a")
       :tarpath "tar"
       :test false
       :use-batch-shell iswin

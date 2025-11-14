@@ -6,7 +6,7 @@
 ###
 
 (import ./dagbuild)
-(import ./shutil)
+(import ./shutil :as sh)
 
 (defn- executor
   "How to execute a rule at runtime -
@@ -28,7 +28,7 @@
             (debug/stacktrace fib err "error: ")
             (eprint "error: " err)))
         (each o (get rule :outputs [])
-          (protect (shutil/rm o)))
+          (protect (sh/rm o)))
         :error))))
 
 (defn- target-not-found
@@ -181,17 +181,17 @@
 (defmacro sh-rule
   "Add a rule that invokes a shell command, and fails if the command returns non-zero."
   [target deps & body]
-  ~(,rule-impl ,target ,deps (fn [] (,shutil/shell (,string ,;body)))))
+  ~(,rule-impl ,target ,deps (fn [] (,sh/shell (,string ,;body)))))
 
 (defmacro sh-task
   "Add a task that invokes a shell command, and fails if the command returns non-zero."
   [target deps & body]
-  ~(,rule-impl ,target ,deps (fn [] (,shutil/shell (,string ,;body))) true))
+  ~(,rule-impl ,target ,deps (fn [] (,sh/shell (,string ,;body))) true))
 
 (defmacro sh-phony
   "Alias for `sh-task`."
   [target deps & body]
-  ~(,rule-impl ,target ,deps (fn [] (,shutil/shell (,string ,;body))) true))
+  ~(,rule-impl ,target ,deps (fn [] (,sh/shell (,string ,;body))) true))
 
 (defmacro add-body
   "Add recipe code to an existing rule. This makes existing rules do more but
