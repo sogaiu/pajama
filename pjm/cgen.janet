@@ -59,9 +59,23 @@
   # Basic utilities
 
   (def indent @"")
-  (defn emit-indent [] (prin indent))
-  (defn emit-block-start [] (prin "{") (buffer/push indent "  ") (print))
-  (defn emit-block-end [&opt nl] (buffer/popn indent 2) (emit-indent) (prin "}") (when nl (print)))
+
+  (defn emit-indent
+    []
+    (prin indent))
+
+  (defn emit-block-start
+    []
+    (prin "{")
+    (buffer/push indent "  ")
+    (print))
+
+  (defn emit-block-end
+    [&opt nl]
+    (buffer/popn indent 2)
+    (emit-indent)
+    (prin "}")
+    (when nl (print)))
 
   # Mutually recrusive functions
 
@@ -159,17 +173,22 @@
            :tuple
            (case (get definition 0)
              'struct (emit-struct-def nil (slice definition 1) alias)
-             'named-struct (emit-struct-def (definition 1) (slice definition 1) alias)
+             'named-struct (emit-struct-def (definition 1)
+                                            (slice definition 1) alias)
              'enum (emit-enum-def nil (slice definition 1) alias)
-             'named-enum (emit-enum-def (definition 1) (slice definition 2) alias)
+             'named-enum (emit-enum-def (definition 1)
+                                        (slice definition 2) alias)
              'union (emit-union-def nil (slice definition 1) alias)
-             'named-union (emit-union-def (definition 1) (slice definition 2) alias)
-             'fn (emit-fn-pointer-type (definition 1) (slice definition 2) alias)
+             'named-union (emit-union-def (definition 1)
+                                          (slice definition 2) alias)
+             'fn (emit-fn-pointer-type (definition 1)
+                                       (slice definition 2) alias)
              'ptr (emit-ptr-type (definition 1) alias)
              '* (emit-ptr-type (definition 1) alias)
              'ptrptr (emit-ptr-ptr-type (definition 1) alias)
              '** (emit-ptr-ptr-type (definition 1) alias)
-             'array (emit-array-type (definition 1) (get definition 2) alias)
+             'array (emit-array-type (definition 1)
+                                     (get definition 2) alias)
              'const (emit-const-type (definition 1) alias)
              (errorf "unexpected type form %v" definition))
            :keyword (do (prin definition) (when alias (prin " " alias)))
@@ -242,7 +261,8 @@
 
   (defn emit-struct-ctor
     [args]
-    (assert (even? (length args)) "expected an even number of arguments for a struct literal")
+    (assert (even? (length args))
+            "expected an even number of arguments for a struct literal")
     (emit-block-start)
     (each [k v] (partition 2 args)
       (emit-indent)
@@ -313,11 +333,13 @@
                     (unless noparen (prin ")")))
            :struct (do
                      (unless noparen (prin "("))
-                     (emit-struct-ctor (mapcat identity (sort (pairs form))))
+                     (emit-struct-ctor (mapcat identity
+                                               (sort (pairs form))))
                      (unless noparen (print ")")))
            :table (do
                     (unless noparen (prin "("))
-                    (emit-struct-ctor (mapcat identity (sort (pairs form))))
+                    (emit-struct-ctor (mapcat identity
+                                              (sort (pairs form))))
                     (unless noparen (print ")")))
            (errorf "invalid expression %v" form)))
 
@@ -350,7 +372,8 @@
 
   (defn emit-cond
     [args]
-    (assert (>= (length args) 2) "expected at least 2 arguments to if")
+    (assert (>= (length args) 2)
+            "expected at least 2 arguments to if")
     (var is-first true)
     (each [condition branch] (partition 2 args)
       (if (= nil branch)
@@ -429,15 +452,19 @@
          [form]
          (case (get form 0)
            'defn (if (indexed? (form 1))
-                   (emit-function (form 1) (form 2) (form 3) (form 4) (slice form 5))
-                   (emit-function [] (form 1) (form 2) (form 3) (slice form 4)))
+                   (emit-function (form 1) (form 2) (form 3) (form 4)
+                                  (slice form 5))
+                   (emit-function [] (form 1) (form 2) (form 3)
+                                  (slice form 4)))
            'deft (do (print) (emit-typedef (form 1) (form 2)))
            'def (do (print)
                   (if (indexed? (form 1))
                     (do
                       (emit-storage-classes (form 1))
-                      (emit-declaration (form 2) (form 3) (form 4)) (print ";"))
-                    (emit-declaration (form 1) (form 2) (form 3) (print ";"))))
+                      (emit-declaration (form 2) (form 3) (form 4))
+                      (print ";"))
+                    (emit-declaration (form 1) (form 2) (form 3)
+                                      (print ";"))))
            'directive (emit-directive ;(slice form 1))
            '@ (emit-directive ;(slice form 1))
            (errorf "unknown top-level form %v" form)))

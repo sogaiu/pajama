@@ -278,7 +278,9 @@
                   (def rest (:read f :all))
                   (string (when auto-shebang
                             (string "#!" (cnf/dyn:binpath) "/janet\n"))
-                          first-line (when hardcode second-line) rest)))
+                          first-line
+                          (when hardcode second-line)
+                          rest)))
               (def destpath (string (dyn :dest-dir "") path))
               (sh/create-dirs destpath)
               (print "installing " main " to " destpath)
