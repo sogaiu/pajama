@@ -27,27 +27,30 @@
                                   (any (choice (capture :d)
                                                :one))))}))
 
-(comment
-
-  (peg/match mangle-peg "make-config")
-  # =>
-  @["make_config"]
-
-  (peg/match mangle-peg "a1")
-  # =>
-  @["a1"]
-
-  (peg/match mangle-peg "1")
-  # =>
-  @["_X49"]
-
-  )
-
 (defn mangle
-  "Convert any sequence of bytes to a valid C identifier in a way that is unlikely to collide.
-  `print-ir` will not mangle symbols for you."
+  ``
+  Convert any sequence of bytes to a valid C identifier in a way
+  that is unlikely to collide. `print-ir` will not mangle symbols
+  for you.
+  ``
   [token]
   (first (peg/match mangle-peg token)))
+
+(comment
+
+  (mangle "make-config")
+  # =>
+  "make_config"
+
+  (mangle "a1")
+  # =>
+  "a1"
+
+  (mangle "1")
+  # =>
+  "_X49"
+
+  )
 
 (defn print-ir
   "Compile the CGEN IR to C and print it to (dyn :out)."

@@ -13,22 +13,22 @@
                               (replace (capture 1)
                                        ,|(string "_" (get $ 0) "_")))))))
 
-(comment
-
-  (peg/match entry-replacer "https://localhost")
-  # =>
-  @["https_58__47__47_localhost"]
-
-  (peg/match entry-replacer "https://github.com/janet-lang/janet")
-  # =>
-  @["https_58__47__47_github_46_com_47_janet_45_lang_47_janet"]
-
-  )
-
 (defn entry-replace
   "Escape special characters in the entry-name."
   [name]
   (get (peg/match entry-replacer name) 0))
+
+(comment
+
+  (entry-replace "https://localhost")
+  # =>
+  "https_58__47__47_localhost"
+
+  (entry-replace "https://github.com/janet-lang/janet")
+  # =>
+  "https_58__47__47_github_46_com_47_janet_45_lang_47_janet"
+
+  )
 
 (defn embed-name
   "Rename a janet symbol for embedding."
