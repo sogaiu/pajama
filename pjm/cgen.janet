@@ -444,7 +444,10 @@
     (emit-top top)))
 
 (defmacro ir
-  "Macro that automatically quotes the body provided and calls (print-ir ...) on the body."
+  ``
+  Macro that automatically quotes the body provided and calls
+  `(print-ir ...)` on the body.
+  ``
   [& body]
   ~(,print-ir ',body))
 

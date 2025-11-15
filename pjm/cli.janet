@@ -41,13 +41,15 @@
   )
 
 (defn setup
-  ``Load configuration from the command line, environment variables, and
-  configuration files. Returns array of non-configuration arguments as well.
-  Config settings are prioritized as follows:
-     1. Commmand line settings
-     2. The value of `(dyn :pjm-config)`
-     3. Environment variables
-     4. Config file settings (default-config if non specified)
+  ``
+  Load configuration from the command line, environment variables,
+  and configuration files. Returns array of non-configuration
+  arguments as well. Config settings are prioritized as follows:
+
+  1. Commmand line settings
+  2. The value of `(dyn :pjm-config)`
+  3. Environment variables
+  4. Config file settings (default-config if non specified)
   ``
   [args]
   (cnf/read-env-variables)

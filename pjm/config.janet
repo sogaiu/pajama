@@ -120,7 +120,7 @@
   (or (nil? x) (int? x)))
 
 (def- config-checker-types
-  "A table of all of the option checkers"
+  "A table of all of the option checkers."
   @{:int int?
     :int-opt int-or-nil?
     :int? int-or-nil?
@@ -131,7 +131,7 @@
     :boolean boolean-or-nil?})
 
 (defmacro defconf
-  "Define a function that wraps (dyn :keyword). This will
+  "Define a function that wraps `(dyn :keyword)`. This will
   allow use of dynamic bindings with static runtime checks."
   [kw &opt parser docs options]
   (put config-parsers kw (get config-parser-types parser))
@@ -184,8 +184,11 @@
   nil)
 
 (defn load-config-file
-  "Load a configuration from a file. If override is set, will override already set values.
-  Otherwise will prefer the current value over the settings from the config file."
+  ``
+  Load a configuration from a file. If `override` is set, will
+  override already set values. Otherwise will prefer the current
+  value over the settings from the config file.
+  ``
   [path &opt override]
   (def config-table
     (if (string/has-suffix? ".janet" path)
@@ -223,7 +226,8 @@
     (setdyn k v)))
 
 (defn read-env-variables
-  "Read environment variables that correspond to config variables into dyns."
+  "Read environment variables that correspond to config variables
+  into dyns."
   []
   (setwhen :gitpath "JANET_GIT")
   (setwhen :tarpath "JANET_TAR")
